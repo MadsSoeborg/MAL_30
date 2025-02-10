@@ -1,0 +1,2 @@
+[MASTER]
+init-hook='import sys; sys.path.append("/opt/anaconda-2024.02/lib/python3.11/site-packages/")'
