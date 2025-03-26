@@ -98,7 +98,7 @@ class MyLinReg:
         X_train_int = self._add_intercept(X_train)
         weights = np.zeros(n_features + 1)
 
-        # Early Stopping Setup (only if validation data is provided)
+        # Early stopping setup
         perform_early_stopping = X_val is not None and y_val is not None
         X_val_int = self._add_intercept(X_val) if perform_early_stopping else None
         best_val_loss = np.inf
@@ -113,23 +113,23 @@ class MyLinReg:
             lr = self._get_adaptive_learning_rate(i) if adaptive_lr else self.eta0
             weights -= lr * gradient
 
-            # --- Early Stopping Check ---
+            # Early stopping check
             if perform_early_stopping:
                 current_val_loss = self._compute_loss(X_val_int, y_val, weights)
                 self.val_history_.append(current_val_loss)
 
                 if current_val_loss < best_val_loss - self.tol:
                     best_val_loss = current_val_loss
-                    self._best_weights = weights.copy() # Store the best weights
+                    self._best_weights = weights.copy()
                     no_improvement_count = 0
                 else:
                     no_improvement_count += 1
 
                 if no_improvement_count >= self.n_iter_no_change:
                     print(f"Early stopping triggered at iteration {i+1} (Batch GD).")
-                    break # Exit the loop
+                    break
 
-        # --- Finalize Weights ---
+        # Finalize weights
         final_weights = self._best_weights if self._best_weights is not None else weights
         self.intercept_ = final_weights[0]
         self.coef_ = final_weights[1:]
@@ -244,32 +244,31 @@ class MyLinReg:
         self.history_ = []
         self.val_history_ = []
         self._best_weights = None
-        self.intercept_ = None # Ensure model is not considered 'fitted' until end
+        self.intercept_ = None
         self.coef_ = None
 
         X_train, y_train = X, y
         X_val, y_val = None, None
 
-        # --- Prepare validation set if early stopping is enabled ---
+        # Prepare validation set if early stopping is enabled
         if self.early_stopping:
             if 0.0 < self.validation_split < 1.0:
                 try:
                     X_train, X_val, y_train, y_val = train_test_split(
                         X, y, test_size=self.validation_split, random_state=42
                     )
-                    if len(X_val) == 0: # Handle unlikely case of empty validation set
+                    if len(X_val) == 0: # Handle case of empty validation set
                         warnings.warn("Validation split resulted in an empty set. Disabling early stopping for this fit.")
                         X_train, y_train = X, y # Use all data for training
-                        X_val, y_val = None, None # Ensure validation args are None
+                        X_val, y_val = None, None
                 except ValueError as e:
                      warnings.warn(f"Could not create validation split (Error: {e}). Disabling early stopping for this fit.")
                      X_train, y_train = X, y
                      X_val, y_val = None, None
             else:
                 warnings.warn("validation_split must be > 0 and < 1 for early stopping. Disabling early stopping for this fit.")
-                # Keep X_train=X, y_train=y, X_val=None, y_val=None
 
-        # --- Call the selected gradient descent method ---
+        # Call the selected gradient descent method
         common_args = (X_train, y_train)
         common_kwargs = {'adaptive_lr': adaptive_lr, 'X_val': X_val, 'y_val': y_val}
 
