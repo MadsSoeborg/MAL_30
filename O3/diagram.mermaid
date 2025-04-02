@@ -1,0 +1,29 @@
+graph TD
+    A[Input Layer: 28x28x1] --> B[Conv2D: 32 filters, 3x3, ReLU]
+    B --> C[Conv2D: 32 filters, 3x3, ReLU]
+    C --> D[MaxPooling2D: 2x2]
+    
+    D --> E[Conv2D: 64 filters, 3x3, ReLU]
+    E --> F[Conv2D: 128 filters, 3x3, ReLU]
+    F --> G[MaxPooling2D: 2x2]
+    
+    G --> H[Flatten]
+    H --> I[Dropout: 0.5]
+    I --> J[Dense: 128 neurons, ReLU]
+    J --> K[Dropout: 0.7]
+    K --> L[Dense: 10 neurons, Softmax]
+    
+    style A fill:#f9f,stroke:#333,stroke-width:2px
+    style L fill:#4F7942,stroke:#333,stroke-width:2px
+    
+    classDef conv fill:#FFA07A,stroke:#333,stroke-width:1px
+    classDef pool fill:#87CEFA,stroke:#333,stroke-width:1px
+    classDef flat fill:#FFD700,stroke:#333,stroke-width:1px
+    classDef drop fill:#D3D3D3,stroke:#333,stroke-width:1px
+    classDef dense fill:#98FB98,stroke:#333,stroke-width:1px
+    
+    class B,C,E,F conv
+    class D,G pool
+    class H flat
+    class I,K drop
+    class J dense
